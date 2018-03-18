@@ -14,6 +14,7 @@ from threading import Thread
 import cv2
 
 class WebcamVideoStream:
+    
 	def __init__(self, src=0):
 		# initialize the video camera stream and read the first frame
 		# from the stream
@@ -23,7 +24,13 @@ class WebcamVideoStream:
 		# initialize the variable used to indicate if the thread should
 		# be stopped
 		self.stopped = False
-
+    
+		if self.frame is not None:
+				# get frame size
+				self.h, self.w, self.channels = self.frame.shape
+		else:
+				raise Exception('Unable to open camera connection')
+                
 	def start(self):
 		# start the thread to read frames from the video stream
 		Thread(target=self.update, args=()).start()

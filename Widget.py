@@ -204,12 +204,11 @@ class FPS_plot(Widget):
     time_last_fps_update = clock()
     fps_buffer = RingBuffer(length=num_fps_points_in_memory, width=2)
     plot_buffer = np.zeros((plot_h, w, 4)).astype(np.uint8)
-    line_width = 1  # np.max((2, h//100))
-    axes_lineThickness = 1
+    line_width = 2  # np.max((2, h//100))
+    axes_lineThickness = 2
     plot_alpha = 0.7
     fps_scale_minor_unit = 10    
     smoothing_MA = 3 
-    verbose = True
         
     def __init__(self, interface, position='TL', size=None):
         super().__init__(interface, position, size)
@@ -223,8 +222,6 @@ class FPS_plot(Widget):
     def update(self):
         # Update frame rate        
         dt2 = clock() - self.time_last_fps_update
-        if self.verbose:
-            print('fps: %f' % self.fps)
         self.fps = (self.interface.frame_count - self.last_frame_seen) / dt2
         self.last_frame_seen = self.interface.frame_count
         self.time_last_fps_update = clock()

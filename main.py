@@ -16,21 +16,19 @@ from WebcamVideoStream import WebcamVideoStream
 from Widget import Timer, SubImage, HistogramPlot, FPS_plot
 
 class Interface:
-    
-#    gui_w = 1920
-#    gui_h = 1080
-    gui_w = 640
-    gui_h = 480
-    
+        
     last_frame = None
     frame_count = 0
     
     def __init__(self):
         
         # Setup camera
-        cam_id = 1
+        cam_id = 0
         self.mirror = False
         self.cam = WebcamVideoStream(src=cam_id).start()
+        
+        self.gui_w = self.cam.w
+        self.gui_h = self.cam.h
         
         # Create processing modules list
         self.module_data = {}
@@ -43,6 +41,10 @@ class Interface:
         
 
     def run(self):
+        
+        # debug        
+#        img = cv2.imread('test_image.jpg')
+#        img = cv2.resize(img, (960,540)).astype(np.uint8)
         
         for module in self.modules:
             module.update()
