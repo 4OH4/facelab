@@ -14,6 +14,7 @@ import cv2 as cv2
 # local modules
 from WebcamVideoStream import WebcamVideoStream
 from Widget import Timer, SubImage, HistogramPlot, FPS_plot
+#from FacialLandmarks import FacialLandmarker68
 
 class Interface:
         
@@ -26,7 +27,7 @@ class Interface:
         cam_id = 0
         self.mirror = False
         self.cam = WebcamVideoStream(src=cam_id).start()
-        
+                
         self.gui_w = self.cam.w
         self.gui_h = self.cam.h
         
@@ -34,10 +35,17 @@ class Interface:
         self.module_data = {}
         timer = Timer(self, position='TR')
         sub_image = SubImage(self, position='TL')
+#        sub_image = FacialLandmarker68(self, position='TL')
         fps_plot = FPS_plot(self, position='BR')
         hist_plot = HistogramPlot(self, position='BL')
        
         self.modules = [timer, hist_plot, fps_plot, sub_image]
+        
+        # Define the codec and create VideoWriter object
+        self.write_output = False
+        if self.write_output:
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            self.output_writer = cv2.VideoWriter('output.avi',fourcc, 20.0, (self.cam.w,self.cam.h))
         
 
     def run(self):
@@ -76,22 +84,30 @@ class Interface:
                         
                 cv2.imshow('facelab', output_image)
                 
+                if self.write_output:
+                    self.output_writer.write(output_image)
+                
             else:
                 print("img is none")
+#                break
             
             key = cv2.waitKey(1)
             if key == 27:
                 break
-
+        
+        if self.write_output:
+            self.output_writer.release()
+            
         self.clean_up()
             
             
     def clean_up(self):
         # Get rid of any remaining components and shut down the threads
-        cv2.destroyAllWindows()        
+        cv2.destroyAllWindows()    
         for module in self.modules:
             module.running = False
             module.thread.join()
+        self.cam.release()
             
 
 def blend_transparent(face_img, overlay_t_img):
