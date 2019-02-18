@@ -106,8 +106,8 @@ class Timer(Widget):
 
 class HistogramPlot(Widget):
     # Adds a histogram plot of pixel intensities to the image
-    w = 200
-    h = 100
+    w = 150
+    h = 50
     update_period = 1
 
     plot_alpha = 0.7
@@ -115,7 +115,7 @@ class HistogramPlot(Widget):
     grid_lineThickness = 1
     numBins = 256
     scaling_buffer = []  # Take the moving median scaling factor for smoothness
-    scaling_buffer_max_len = 10
+    scaling_buffer_max_len = 5
 
     def __init__(self, interface, position='TL', size=None):
         super().__init__(interface, position, size)

@@ -53,3 +53,7 @@ class WebcamVideoStream:
 	def stop(self):
 		# indicate that the thread should be stopped
 		self.stopped = True
+
+	def release(self):
+		# indicate that the thread should be stopped
+		self.stream.release()
