@@ -78,20 +78,18 @@ class WebcamVideoStream(InputStream):
 
 
 class VideoFileStream(InputStream):
-    def __init__(self, src: str):
+    def __init__(self, src: str, downsample=1):
         # initialize the video file and read the first frame
         self.stream = cv2.VideoCapture(src)
-        (self.grabbed, self.frame) = self.stream.read()
+        self.downsample = downsample
 
-        # initialize the variable used to indicate if the thread should
-        # be stopped
-        self.stopped = False
-
-        if self.frame is not None:
-            # get frame size
-            self.h, self.w, self.channels = self.frame.shape
+        if not self.stream.isOpened():
+            raise Exception(f"Error opening video file: {src}")
+            self.stopped = True
         else:
-            raise Exception("Unable to open camera connection")
+            self.stopped = False
+            # (self.grabbed, self.frame) = self.stream.read()
+            self.read()
 
     def read(self):
         # return the frame most recently read
@@ -100,6 +98,25 @@ class VideoFileStream(InputStream):
 
         # otherwise, read the next frame from the stream
         (self.grabbed, self.frame) = self.stream.read()
+
+        if self.frame is not None:
+            # get frame size
+            h, w, channels = self.frame.shape
+            # self.h, self.w, self.channels = self.frame.shape
+
+            if self.downsample != 1:
+
+                h = h // self.downsample
+                w = w // self.downsample
+
+                self.frame = cv2.resize(
+                    self.frame, (w, h), interpolation=cv2.INTER_AREA
+                )
+
+            self.h, self.w, self.channels = h, w, channels
+
+        # else:
+        #     raise Exception("Unable to read from video file")
 
         return self.frame
 
@@ -110,3 +127,9 @@ class VideoFileStream(InputStream):
     def release(self):
         # indicate that the thread should be stopped
         self.stream.release()
+
+    def goToFrame(self, frameNum=0):
+        if frameNum != 0:
+            raise NotImplementedError
+
+        self.stream.set(2, 0)  # cv2.CV_CAP_PROP_POS_FRAMES
